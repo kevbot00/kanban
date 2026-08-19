@@ -8,7 +8,7 @@ const Board: React.FC<{ id: string }> = ({ id }) => {
   return (
     <div className="flex items-start gap-4 overflow-x-auto p-6">
       {columns.map((column) => (
-        <Column key={column.id} title={column.title} />
+        <Column key={column.id} title={column.title} cards={column.cards} />
       ))}
     </div>
   );
