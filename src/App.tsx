@@ -6,7 +6,7 @@ function App() {
       <header className="border-b border-slate-200 bg-white px-6 py-4">
         <h1 className="text-xl font-bold text-slate-800">Kanban Board</h1>
       </header>
-      <Board />
+      <Board id={'board-1'}/>
     </main>
   )
 }

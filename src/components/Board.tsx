@@ -1,14 +1,17 @@
-import React from 'react';
-import Column from './Column';
+import React from "react";
+import Column from "./Column";
+import useBoard from "../hooks/useBoard";
 
-const Board: React.FC = () => {
+const Board: React.FC<{ id: string }> = ({ id }) => {
+  const { columns } = useBoard(id);
+
   return (
     <div className="flex items-start gap-4 overflow-x-auto p-6">
-      <Column title="To Do" />
-      <Column title="In Progress" />
-      <Column title="Done" />
+      {columns.map((column) => (
+        <Column key={column.id} title={column.title} />
+      ))}
     </div>
-  )
-}
+  );
+};
 
 export default Board;
