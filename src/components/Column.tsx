@@ -9,23 +9,21 @@ interface ColumnProps {
 const Column: React.FC<ColumnProps> = ({ title, cards }) => {
   return (
     <div className="flex-shrink-0 w-64 border border-slate-200 rounded-lg p-4 bg-slate-50">
-      <div className="mb-2 flex items-center justify-between">
         <h2 className="text-lg font-bold">{title}</h2>
+        <div className="flex flex-col gap-2">
+          {cards.map((card) => (
+            <Card key={card.id} title={card.title} />
+          ))}
+        </div>
         <button
           type="button"
           aria-label={`Add card to ${title}`}
-          className="flex h-6 w-6 items-center justify-center rounded text-slate-500 hover:bg-slate-300 hover:text-slate-800"
+          className="mt-2 w-full rounded px-2 py-1.5 text-center text-sm text-slate-500 hover:bg-slate-200 hover:text-slate-800"
         >
           +
         </button>
-      </div>
-      <div className="flex flex-col gap-2">
-        {cards.map((card) => (
-          <Card key={card.id} title={card.title} />
-        ))}
-      </div>
     </div>
-  )
-}
+  );
+};
 
 export default Column;
