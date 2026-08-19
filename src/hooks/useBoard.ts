@@ -90,11 +90,14 @@ const useBoard = (_id: string) => {
 
     if (event.canceled) return;
 
-    const { source } = event.operation;
+    const { source, target } = event.operation;
     if (!source) return;
 
+    const toColumnId = String(target?.group ?? target?.id ?? source.group);
+    const toIndex = typeof target?.index === 'number' ? target.index : 0;
+
     flushSync(() => {
-      moveCard(String(source.id), String(source.group), source.index);
+      moveCard(String(source.id), toColumnId, toIndex);
     });
   };
 
