@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 import { DragDropProvider } from '@dnd-kit/react';
-import Column from "./Column";
-import useBoard from "../hooks/useBoard";
+import Column from './Column';
+import useBoard from '../hooks/useBoard';
 
 const Board: React.FC<{ id: string }> = ({ id }) => {
   const { columns, handleDragStart, handleDragEnd } = useBoard(id);

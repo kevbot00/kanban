@@ -1,32 +1,32 @@
-import { useState, useRef } from "react";
-import { flushSync } from "react-dom";
+import { useState, useRef } from 'react';
+import { flushSync } from 'react-dom';
 
 export const mockBoard = {
-  id: "board-1",
+  id: 'board-1',
   columns: [
     {
-      id: "1",
-      title: "To Do",
+      id: '1',
+      title: 'To Do',
       cards: [
-        { id: "card-5", title: "Persist board to localStorage" },
-        { id: "card-6", title: "Write Playwright drag test" },
-        { id: "card-7", title: "Deploy to AWS" },
+        { id: 'card-5', title: 'Persist board to localStorage' },
+        { id: 'card-6', title: 'Write Playwright drag test' },
+        { id: 'card-7', title: 'Deploy to AWS' },
       ],
     },
     {
-      id: "2",
-      title: "In Progress",
+      id: '2',
+      title: 'In Progress',
       cards: [
-        { id: "card-3", title: "Build board, column, and card components" },
-        { id: "card-4", title: "Wire up dnd-kit sensors" },
+        { id: 'card-3', title: 'Build board, column, and card components' },
+        { id: 'card-4', title: 'Wire up dnd-kit sensors' },
       ],
     },
     {
-      id: "3",
-      title: "Done",
+      id: '3',
+      title: 'Done',
       cards: [
-        { id: "card-1", title: "Scaffold Vite + React + TypeScript" },
-        { id: "card-2", title: "Add Tailwind" },
+        { id: 'card-1', title: 'Scaffold Vite + React + TypeScript' },
+        { id: 'card-2', title: 'Add Tailwind' },
       ],
     },
   ],
@@ -75,10 +75,10 @@ const useBoard = (_id: string) => {
 
   const handleDragEnd = (event: any) => {
     /**
-     * NOTE: Workaround for issues with "OptimisticSortingPlugin" mutating
+     * NOTE: Workaround for issues with 'OptimisticSortingPlugin' mutating
      * the raw DOM, and causing React errors on re-render. We reset the
      * source to its pre-drag parent before updating the state, and use
-     * "flushSync" to hide the sneaky DOM change. https://github.com/clauderic/dnd-kit/issues/1747#issuecomment-4544518742
+     * 'flushSync' to hide the sneaky DOM change. https://github.com/clauderic/dnd-kit/issues/1747#issuecomment-4544518742
      */
     const sourceElement = event.operation.source?.element;
     const prevParent = sourceParentRef.current;
