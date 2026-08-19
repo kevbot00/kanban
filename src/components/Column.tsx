@@ -20,7 +20,7 @@ const Column: React.FC<ColumnProps> = ({ id, title, cards }) => {
         <h2 className="text-lg font-bold">{title}</h2>
         <div className="flex flex-col gap-2">
           {cards.map((card, idx) => (
-            <Card key={card.id} id={card.id} title={card.title} index={idx}/>
+            <Card key={card.id} id={card.id} title={card.title} index={idx} group={id}/>
           ))}
         </div>
         <button

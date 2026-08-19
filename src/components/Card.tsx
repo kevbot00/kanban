@@ -1,10 +1,11 @@
 import React from "react";
 import { useSortable } from "@dnd-kit/react/sortable";
 
-const Card: React.FC<{ id: string; title: string; index: number }> = ({ id, title, index }) => {
+const Card: React.FC<{ id: string; title: string; index: number, group: string }> = ({ id, title, index, group}) => {
   const { ref } = useSortable({
     id,
     index,
+    group,
     type: 'card',
     accept: 'card'
   });

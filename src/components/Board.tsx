@@ -4,13 +4,12 @@ import Column from "./Column";
 import useBoard from "../hooks/useBoard";
 
 const Board: React.FC<{ id: string }> = ({ id }) => {
-  const { columns } = useBoard(id);
+  const { columns, handleDragStart, handleDragEnd } = useBoard(id);
 
   return (
     <DragDropProvider
-      onDragEnd={(event) => {
-        console.log('Drag ended:', event);
-      }}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
     >
       <div className="flex items-start gap-4 overflow-x-auto p-6">
         {columns.map((column) => (
@@ -18,7 +17,6 @@ const Board: React.FC<{ id: string }> = ({ id }) => {
         ))}
       </div>
     </DragDropProvider>
-
   );
 };
 
