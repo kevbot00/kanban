@@ -32,13 +32,16 @@ export const mockBoard = {
   ],
 };
 
-const useBoard = (_id: string) => {
+const useBoard = (id: string) => {
   const [columns, setColumns] = useState(mockBoard.columns);
+  const [selectedCard, setSelectedCard] = useState<any>(null);
   const sourceParentRef = useRef<Element | null>(null);
 
   const moveCard = (cardId: string, toColumnId: string, toIndex: number) => {
     setColumns((prev) => {
-      const fromCol = prev.find((col) => col.cards.some((c) => c.id === cardId));
+      const fromCol = prev.find((col) =>
+        col.cards.some((c) => c.id === cardId),
+      );
       if (!fromCol) return prev;
 
       const currentIndex = fromCol.cards.findIndex((c) => c.id === cardId);
@@ -51,7 +54,11 @@ const useBoard = (_id: string) => {
           const without = col.cards.filter((c) => c.id !== cardId);
           return {
             ...col,
-            cards: [...without.slice(0, toIndex), card, ...without.slice(toIndex)],
+            cards: [
+              ...without.slice(0, toIndex),
+              card,
+              ...without.slice(toIndex),
+            ],
           };
         }
         if (col.id === fromCol.id) {
@@ -60,7 +67,11 @@ const useBoard = (_id: string) => {
         if (col.id === toColumnId) {
           return {
             ...col,
-            cards: [...col.cards.slice(0, toIndex), card, ...col.cards.slice(toIndex)],
+            cards: [
+              ...col.cards.slice(0, toIndex),
+              card,
+              ...col.cards.slice(toIndex),
+            ],
           };
         }
         return col;
@@ -84,7 +95,11 @@ const useBoard = (_id: string) => {
     const prevParent = sourceParentRef.current;
     sourceParentRef.current = null;
 
-    if (sourceElement && prevParent && sourceElement.parentElement !== prevParent) {
+    if (
+      sourceElement &&
+      prevParent &&
+      sourceElement.parentElement !== prevParent
+    ) {
       prevParent.appendChild(sourceElement);
     }
 
@@ -101,10 +116,23 @@ const useBoard = (_id: string) => {
     });
   };
 
+  const openCard = (id: string) => {
+    const selectedCard =
+      columns.flatMap((c) => c.cards).find((c) => c.id === id) ?? null;
+    setSelectedCard(selectedCard);
+  };
+
+  const closeCard = () => {
+    setSelectedCard(null);
+  };
+
   return {
     columns,
     handleDragStart,
     handleDragEnd,
+    openCard,
+    selectedCard,
+    closeCard,
   };
 };
 
