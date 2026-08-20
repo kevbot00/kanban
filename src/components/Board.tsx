@@ -11,7 +11,7 @@ const Board: React.FC<{ id: string }> = ({ id }) => {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex items-start gap-4 overflow-x-auto p-6">
+      <div className="flex min-h-0 flex-1 gap-4 overflow-x-auto p-6">
         {columns.map((column) => (
           <Column key={column.id} id={column.id} title={column.title} cards={column.cards} />
         ))}

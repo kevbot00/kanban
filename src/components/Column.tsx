@@ -21,10 +21,10 @@ const Column: React.FC<ColumnProps> = ({ id, title, cards }) => {
   return (
     <div
       ref={ref}
-      className="flex-shrink-0 w-64 border border-slate-200 rounded-lg p-4 bg-slate-50"
+      className="flex w-64 shrink-0 flex-col rounded-lg border border-slate-200 bg-slate-50 p-4"
     >
-      <h2 className="text-lg font-bold">{title}</h2>
-      <div className="flex flex-col gap-2">
+      <h2 className="shrink-0 text-lg font-bold">{title}</h2>
+      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
         {cards.map((card, idx) => (
           <Card
             key={card.id}
@@ -34,8 +34,6 @@ const Column: React.FC<ColumnProps> = ({ id, title, cards }) => {
             group={id}
           />
         ))}
-      </div>
-
       {isAdding ? (
         <form className="mt-2" onSubmit={handleSubmit}>
           <input
@@ -63,6 +61,8 @@ const Column: React.FC<ColumnProps> = ({ id, title, cards }) => {
           +
         </button>
       )}
+      </div>
+
     </div>
   );
 };
