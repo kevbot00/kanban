@@ -10,7 +10,7 @@ const Board: React.FC<{ id: string }> = ({ id }) => {
     handleDragStart,
     handleDragEnd,
     openCard,
-    selectedCard,
+    selectedCardId,
     closeCard,
   } = useBoard(id);
 
@@ -27,7 +27,7 @@ const Board: React.FC<{ id: string }> = ({ id }) => {
           />
         ))}
       </div>
-      <CardModal card={selectedCard} onClose={closeCard} />
+      <CardModal id={selectedCardId} onClose={closeCard} />
     </DragDropProvider>
   );
 };

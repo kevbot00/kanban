@@ -1,17 +1,30 @@
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 
 const CardModal: React.FC<{
-  card: { id: string; title: string } | null;
+  id: string;
   onClose: () => void;
-}> = ({ card, onClose }) => {
+}> = ({ id, onClose }) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-    if (card && !dialog.open) dialog.showModal();
-    if (!card && dialog.open) dialog.close();
-  }, [card]);
+    if (id && !dialog.open) dialog.showModal();
+    if (!id && dialog.open) dialog.close();
+  }, [id]);
+
+  const { data: card } = useQuery({
+    queryKey: ['card', id],
+    queryFn: async () => {
+      const resp = await fetch(`/api/cards/${id}`);
+      if (!resp.ok) {
+        throw new Error('Failed to fetch card');
+      }
+      return resp.json();
+    },
+  });
+  console.log("🚀 ~ CardModal ~ card:", card)
 
   return (
     <dialog

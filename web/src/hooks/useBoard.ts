@@ -1,3 +1,4 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, useRef } from 'react';
 import { flushSync } from 'react-dom';
 
@@ -33,9 +34,23 @@ export const mockBoard = {
 };
 
 const useBoard = (id: string) => {
-  const [columns, setColumns] = useState(mockBoard.columns);
-  const [selectedCard, setSelectedCard] = useState<any>(null);
+  const [columns, setColumns] = useState([]);
+  const [selectedCardId, setSelectedCard] = useState<any>(null);
   const sourceParentRef = useRef<Element | null>(null);
+
+  const { data: board } = useQuery({
+    queryKey: ['board', id],
+    queryFn: async () => {
+      console.log("🚀 ~ useBoard ~ id:", id)
+      const resp = await fetch(`/api/boards/${id}`);
+      console.log("🚀 ~ useBoard ~ resp:", resp)
+      if (!resp.ok) {
+        throw new Error('Failed to fetch board');
+      }
+      return resp.json();
+    }
+  });
+
 
   const moveCard = (cardId: string, toColumnId: string, toIndex: number) => {
     setColumns((prev) => {
@@ -117,9 +132,7 @@ const useBoard = (id: string) => {
   };
 
   const openCard = (id: string) => {
-    const selectedCard =
-      columns.flatMap((c) => c.cards).find((c) => c.id === id) ?? null;
-    setSelectedCard(selectedCard);
+    setSelectedCard(id);
   };
 
   const closeCard = () => {
@@ -127,11 +140,11 @@ const useBoard = (id: string) => {
   };
 
   return {
-    columns,
+    columns: board?.columns ?? [],
     handleDragStart,
     handleDragEnd,
     openCard,
-    selectedCard,
+    selectedCardId,
     closeCard,
   };
 };

@@ -20,6 +20,7 @@ export class BoardsService {
           },
         },
       },
+      omit: { createdAt: true, updatedAt: true },
     });
 
     if (!board) return null;
