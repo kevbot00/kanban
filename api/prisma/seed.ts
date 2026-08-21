@@ -6,12 +6,13 @@ const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  // Cascade deletes take the columns and cards with the board, so re-running is safe.
   await prisma.board.deleteMany();
 
   await prisma.board.create({
     data: {
-      id: 'board-1',
+      // Fixed id so the frontend and Playwright can reference a known board.
+      id: '00000000-0000-0000-0000-000000000001',
+      slug: 'kanban-board',
       title: 'Kanban Board',
       columns: {
         create: [

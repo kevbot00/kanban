@@ -12,7 +12,8 @@ datasource db {
 }
 
 model Board {
-  id        String        @id @default(uuid())
+  id        String        @id @default(uuid()) @db.Uuid
+  slug      String        @unique
   title     String
   columns   BoardColumn[]
   createdAt DateTime      @default(now())
@@ -22,25 +23,26 @@ model Board {
 }
 
 model BoardColumn {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid()) @db.Uuid
   title     String
   position  Float
-  boardId   String
+  boardId   String   @db.Uuid
   board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
   cards     Card[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([boardId, title])
   @@index([boardId, position])
   @@map("columns")
 }
 
 model Card {
-  id          String      @id @default(uuid())
+  id          String      @id @default(uuid()) @db.Uuid
   title       String
   description String?
   position    Float
-  columnId    String
+  columnId    String      @db.Uuid
   column      BoardColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
