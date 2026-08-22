@@ -1,30 +1,22 @@
-import { useQuery } from '@tanstack/react-query';
-import { useEffect, useRef } from 'react';
+import React from 'react';
+import useCardModal from '../hooks/useCardModal';
 
 const CardModal: React.FC<{
   id: string;
   onClose: () => void;
 }> = ({ id, onClose }) => {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (id && !dialog.open) dialog.showModal();
-    if (!id && dialog.open) dialog.close();
-  }, [id]);
-
-  const { data: card } = useQuery({
-    queryKey: ['card', id],
-    queryFn: async () => {
-      const resp = await fetch(`/api/cards/${id}`);
-      if (!resp.ok) {
-        throw new Error('Failed to fetch card');
-      }
-      return resp.json();
-    },
-    enabled: Boolean(id),
-  });
+  const {
+    card,
+    dialogRef,
+    textAreaRef,
+    description,
+    isEditingDescription,
+    onDescriptionChange,
+    setIsEditingDescription,
+    onDescriptionBlur,
+    onSaveDescription,
+    onCancelDescription,
+  } = useCardModal(id);
 
   return (
     <dialog
@@ -57,9 +49,38 @@ const CardModal: React.FC<{
                 <h3 className='text-sm font-semibold text-slate-600'>
                   Description
                 </h3>
-                <p className='mt-2 text-sm text-slate-400'>
-                  Add a description…
-                </p>
+                <div className='mt-2'>
+                  <textarea
+                    rows={6}
+                    ref={textAreaRef}
+                    onClick={() => setIsEditingDescription(true)}
+                    onChange={onDescriptionChange}
+                    value={description}
+                    onBlur={onDescriptionBlur}
+                    placeholder='Add description'
+                    className='w-full resize-y rounded-lg border border-slate-300 p-3 text-sm outline-none focus:border-slate-500'
+                  />
+                </div>
+                {isEditingDescription && (
+                  <div className='mt-2 flex gap-2'>
+                    <button
+                      type='button'
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={onCancelDescription}
+                      className='rounded bg-slate-200 px-3 py-1 text-sm text-slate-700 hover:bg-slate-300'
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type='button'
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={onSaveDescription}
+                      className='rounded bg-slate-700 px-3 py-1 text-sm text-white hover:bg-slate-800'
+                    >
+                      Save
+                    </button>
+                  </div>
+                )}
               </section>
             </div>
           </div>
