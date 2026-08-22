@@ -10,7 +10,6 @@ const useAddCard = () => {
 
   const handleBlur = () => {
     setIsAdding(false);
-    console.log('on blur')
   }
 
   const cancelAdding = () => {
@@ -24,7 +23,6 @@ const useAddCard = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('submit')
   }
 
   return {
