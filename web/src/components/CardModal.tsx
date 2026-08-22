@@ -23,8 +23,8 @@ const CardModal: React.FC<{
       }
       return resp.json();
     },
+    enabled: Boolean(id),
   });
-  console.log("🚀 ~ CardModal ~ card:", card)
 
   return (
     <dialog

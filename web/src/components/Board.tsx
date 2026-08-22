@@ -27,7 +27,7 @@ const Board: React.FC<{ id: string }> = ({ id }) => {
           />
         ))}
       </div>
-      <CardModal id={selectedCardId} onClose={closeCard} />
+      {selectedCardId && <CardModal id={selectedCardId} onClose={closeCard} />}
     </DragDropProvider>
   );
 };
