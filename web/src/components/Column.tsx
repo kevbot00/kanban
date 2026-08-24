@@ -20,7 +20,7 @@ const Column: React.FC<ColumnProps> = ({ id, title, cards, openCard }) => {
     title: newCardTitle,
     handleSubmit,
     cancelAdding,
-  } = useAddCard();
+  } = useAddCard(id);
 
   const { ref } = useDroppable({
     id,
