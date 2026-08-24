@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { Card } from '../types';
 
 const useCardModal = (id: string) => {
   const [isEditingDescription, setIsEditingDescription] = useState(false);
@@ -15,26 +16,26 @@ const useCardModal = (id: string) => {
     if (!id && dialog.open) dialog.close();
   }, [id]);
 
-  const { data: card } = useQuery({
+  const { data: card } = useQuery<Card>({
     queryKey: ['card', id],
     queryFn: async () => {
       const resp = await fetch(`/api/cards/${id}`);
       if (!resp.ok) {
         throw new Error('Failed to fetch card');
       }
-      return resp.json();
+      return resp.json() as Promise<Card>;
     },
     enabled: Boolean(id),
   });
 
   useEffect(() => {
     if (card) {
-      setDescription(card.description || '');
+      setDescription(card.description ?? '');
     }
   }, [card]);
 
   const queryClient = useQueryClient();
-  const { mutate: saveDescription } = useMutation({
+  const { mutate: saveDescription } = useMutation<Card, Error, string>({
     mutationFn: async (newDescription: string) => {
       const resp = await fetch(`/api/cards/${id}`, {
         method: 'PATCH',
@@ -42,7 +43,7 @@ const useCardModal = (id: string) => {
         body: JSON.stringify({ description: newDescription }),
       });
       if (!resp.ok) throw new Error('Failed to update description');
-      return resp.json();
+      return resp.json() as Promise<Card>;
     },
     onSuccess: (updatedCard) => {
       queryClient.setQueryData(['card', id], updatedCard);
@@ -59,7 +60,7 @@ const useCardModal = (id: string) => {
   };
 
   const onDescriptionBlur = () => {
-    if (description !== card.description) {
+    if (description !== (card?.description ?? '')) {
       onSaveDescription();
     }
     setIsEditingDescription(false);
@@ -71,7 +72,7 @@ const useCardModal = (id: string) => {
   };
 
   const onCancelDescription = () => {
-    setDescription(card?.description || '');
+    setDescription(card?.description ?? '');
     setIsEditingDescription(false);
   };
 

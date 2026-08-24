@@ -1,12 +1,13 @@
 import React from 'react';
-import Card from './Card';
 import { useDroppable } from '@dnd-kit/react';
+import Card from './Card';
 import useAddCard from '../hooks/useAddCard';
+import type { Card as CardType } from '../types';
 
 interface ColumnProps {
   id: string;
   title: string;
-  cards: { id: string; title: string }[];
+  cards: CardType[];
   openCard: (id: string) => void;
 }
 
