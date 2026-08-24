@@ -4,55 +4,63 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-
-const STEP = 1000;
+import { HIDE_TIMESTAMPS, POSITION_STEP } from '../common/constants';
+import { CreateCardDto } from './dto/create-card.dto';
+import { UpdateCardDto } from './dto/update-card.dto';
+import { MoveCardDto } from './dto/move-card.dto';
 
 @Injectable()
 export class CardsService {
   constructor(private prisma: PrismaService) {}
 
-  findById(id: string): Promise<any> {
-    return this.prisma.card.findUnique({
+  async findById(id: string) {
+    const card = await this.prisma.card.findUnique({
       where: { id },
-      omit: { createdAt: true, updatedAt: true },
+      omit: HIDE_TIMESTAMPS,
     });
+
+    if (!card) throw new NotFoundException(`Card ${id} not found`);
+    return card;
   }
 
-  create(data: { title: string; description: string; columnId: string }) {
+  create({ id, title, description, columnId }: CreateCardDto) {
     return this.prisma.$transaction(async (prisma) => {
       const column = await prisma.boardColumn.findUnique({
-        where: { id: data.columnId },
+        where: { id: columnId },
         select: { id: true },
       });
-
-      if (!column)
-        throw new NotFoundException(`Column ${data.columnId} not found`);
+      if (!column) throw new NotFoundException(`Column ${columnId} not found`);
 
       const last = await prisma.card.findFirst({
-        where: { columnId: data.columnId },
+        where: { columnId },
         orderBy: [{ position: 'desc' }, { id: 'desc' }],
         select: { position: true },
       });
 
       return prisma.card.create({
         data: {
-          title: data.title,
-          description: data.description,
-          columnId: data.columnId,
-          position: last ? last.position + STEP : STEP,
+          id,
+          title,
+          description,
+          columnId,
+          position: last ? last.position + POSITION_STEP : POSITION_STEP,
         },
+        omit: HIDE_TIMESTAMPS,
       });
     });
   }
 
-  update(id: string, data: { title?: string; description?: string }) {
+  async update(id: string, data: UpdateCardDto) {
+    await this.findById(id);
+
     return this.prisma.card.update({
       where: { id },
       data,
+      omit: HIDE_TIMESTAMPS,
     });
   }
 
-  move(id: string, toColumnId: string, toIndex: number) {
+  move(id: string, { toColumnId, toIndex }: MoveCardDto) {
     return this.prisma.$transaction(async (prisma) => {
       const card = await prisma.card.findUnique({
         where: { id },
@@ -81,19 +89,22 @@ export class CardsService {
       });
       const prev = siblings[toIndex - 1]?.position;
       const next = siblings[toIndex]?.position;
-      const position =
-        prev === undefined && next === undefined
-          ? STEP
-          : prev === undefined
-            ? next - STEP
-            : next === undefined
-              ? prev + STEP
-              : (prev + next) / 2;
+
+      let position: number;
+      if (prev === undefined && next === undefined) {
+        position = POSITION_STEP;
+      } else if (prev === undefined) {
+        position = next - POSITION_STEP;
+      } else if (next === undefined) {
+        position = prev + POSITION_STEP;
+      } else {
+        position = (prev + next) / 2;
+      }
 
       return prisma.card.update({
         where: { id },
         data: { columnId: toColumnId, position },
-        omit: { createdAt: true, updatedAt: true },
+        omit: HIDE_TIMESTAMPS,
       });
     });
   }

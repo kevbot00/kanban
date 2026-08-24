@@ -1,37 +1,43 @@
-import { Controller, Get, Param, Patch, Body, Post } from '@nestjs/common';
-import { ApiBody } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CardsService } from './cards.service';
+import { CreateCardDto } from './dto/create-card.dto';
+import { UpdateCardDto } from './dto/update-card.dto';
+import { MoveCardDto } from './dto/move-card.dto';
 
 @Controller('cards')
 export class CardsController {
   constructor(private readonly cardsService: CardsService) {}
 
-  @Get('/:id')
-  getCardById(@Param('id') id: string): Promise<any> {
+  @Get(':id')
+  getCardById(@Param('id', ParseUUIDPipe) id: string) {
     return this.cardsService.findById(id);
   }
 
-  @Patch('/:id')
-  updateCard(@Param('id') id: string, @Body() data: any): Promise<any> {
-    return this.cardsService.update(id, data);
+  @Post()
+  createCard(@Body() dto: CreateCardDto) {
+    return this.cardsService.create(dto);
   }
 
-  @Post('/:id/move')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      required: ['toColumnId', 'toIndex'],
-      properties: {
-        toColumnId: { type: 'string' },
-        toIndex: { type: 'number' },
-      },
-    },
-  })
-  moveCard(
-    @Param('id') id: string,
-    @Body() body: { toColumnId: string; toIndex: number },
-  ): Promise<any> {
-    const { toColumnId, toIndex } = body;
-    return this.cardsService.move(id, toColumnId, toIndex);
+  @Patch(':id')
+  updateCard(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateCardDto,
+  ) {
+    return this.cardsService.update(id, dto);
+  }
+
+  @Post(':id/move')
+  @HttpCode(200)
+  moveCard(@Param('id', ParseUUIDPipe) id: string, @Body() dto: MoveCardDto) {
+    return this.cardsService.move(id, dto);
   }
 }
