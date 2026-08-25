@@ -3,13 +3,16 @@
   "private": true,
   "workspaces": [
     "web",
-    "api"
+    "api",
+    "e2e"
   ],
   "scripts": {
     "dev": "concurrently -n api,web -c blue,green \"npm:dev:api\" \"npm:dev:web\"",
     "dev:api": "npm run dev -w api",
     "dev:web": "npm run dev -w web",
-    "build": "npm run build -ws --if-present"
+    "build": "npm run build -ws --if-present",
+    "test:e2e": "npm run test -w e2e",
+    "test:e2e:ui": "npm run test:ui -w e2e"
   },
   "devDependencies": {
     "concurrently": "^9.2.4"
