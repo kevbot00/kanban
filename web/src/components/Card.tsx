@@ -19,6 +19,7 @@ const Card: React.FC<{
   return (
     <div
       ref={ref}
+      data-testid='card'
       className='cursor-grab rounded-lg bg-white p-3 text-sm text-slate-700 shadow-sm hover:shadow-md'
       onClick={() => openCard(id)}
     >

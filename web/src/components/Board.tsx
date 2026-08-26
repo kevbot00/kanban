@@ -16,7 +16,10 @@ const Board: React.FC<{ id: string }> = ({ id }) => {
 
   return (
     <DragDropProvider onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className='flex min-h-0 flex-1 gap-4 overflow-x-auto p-6'>
+      <div
+        data-testid='board'
+        className='flex min-h-0 flex-1 gap-4 overflow-x-auto p-6'
+      >
         {columns.map((column) => (
           <Column
             key={column.id}

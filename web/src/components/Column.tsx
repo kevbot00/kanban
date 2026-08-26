@@ -31,10 +31,16 @@ const Column: React.FC<ColumnProps> = ({ id, title, cards, openCard }) => {
   return (
     <div
       ref={ref}
+      data-testid='column'
       className='flex w-64 shrink-0 flex-col rounded-lg border border-slate-200 bg-slate-50 p-4'
     >
-      <h2 className='shrink-0 text-lg font-bold'>{title}</h2>
-      <div className='flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto'>
+      <h2 data-testid='column-title' className='shrink-0 text-lg font-bold'>
+        {title}
+      </h2>
+      <div
+        data-testid='column-list'
+        className='flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto'
+      >
         {cards.map((card, idx) => (
           <Card
             key={card.id}
