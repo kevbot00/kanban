@@ -71,7 +71,6 @@ const Column: React.FC<ColumnProps> = ({ id, title, cards, openCard }) => {
         ) : (
           <button
             type='button'
-            aria-label={`Add card to ${title}`}
             className='mt-2 w-full rounded px-2 py-1.5 text-center text-sm text-slate-500 hover:bg-slate-200 hover:text-slate-800'
             onClick={startAdding}
           >
