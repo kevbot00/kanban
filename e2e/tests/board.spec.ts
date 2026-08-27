@@ -1,11 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { SEEDED_BOARD_ID } from '../support/config';
 
 test.describe('Board', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-  });
-
   test('renders the board columns in order', async ({ page }) => {
+    await page.goto('/');
+
     const board = page.getByTestId('board');
     await expect(board.getByTestId('column-title')).toHaveText([
       'To Do',
@@ -15,6 +14,8 @@ test.describe('Board', () => {
   });
 
   test("renders each column's cards in position order", async ({ page }) => {
+      await page.goto('/');
+
     const board = page.getByTestId('board');
     const todoColumn = board.getByTestId('column-list').first();
     await expect(todoColumn.getByTestId('card')).toHaveText([
@@ -35,12 +36,12 @@ test.describe('Board', () => {
   });
 
   test('shows an empty column with no cards', async ({ page }) => {
-    await page.route('**/api/boards/**', (route) => {
+    await page.route('**/api/boards/' + SEEDED_BOARD_ID, (route) => {
       route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          id: 'board-1',
+          id: SEEDED_BOARD_ID,
           title: 'My Board',
           columns: [
             {
