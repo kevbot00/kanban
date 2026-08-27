@@ -21,6 +21,7 @@ const CardModal: React.FC<{
   return (
     <dialog
       ref={dialogRef}
+      data-testid='card-modal'
       onClose={onClose}
       onClick={(e) => {
         if (e.target === dialogRef.current) onClose();
@@ -30,13 +31,14 @@ const CardModal: React.FC<{
       {card && (
         <div className='flex max-h-[85vh] min-h-[60vh] flex-col'>
           <div className='flex shrink-0 items-center justify-between border-b border-slate-200 px-6 py-3'>
-            <h2 className='text-xl font-semibold text-slate-800'>
+            <h2 className='text-xl font-semibold text-slate-800' data-testid='card-modal-title'>
               {card.title}
             </h2>
             <button
               type='button'
               onClick={onClose}
               aria-label='Close'
+              data-testid='card-modal-close-button'
               className='rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700'
             >
               ✕
@@ -59,6 +61,7 @@ const CardModal: React.FC<{
                     onBlur={onDescriptionBlur}
                     placeholder='Add description'
                     className='w-full resize-y rounded-lg border border-slate-300 p-3 text-sm outline-none focus:border-slate-500'
+                    data-testid='card-modal-description-textarea'
                   />
                 </div>
                 {isEditingDescription && (
@@ -68,6 +71,7 @@ const CardModal: React.FC<{
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={onCancelDescription}
                       className='rounded bg-slate-200 px-3 py-1 text-sm text-slate-700 hover:bg-slate-300'
+                      data-testid='card-modal-description-cancel-button'
                     >
                       Cancel
                     </button>
@@ -76,6 +80,7 @@ const CardModal: React.FC<{
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={onSaveDescription}
                       className='rounded bg-slate-700 px-3 py-1 text-sm text-white hover:bg-slate-800'
+                      data-testid='card-modal-description-save-button'
                     >
                       Save
                     </button>
