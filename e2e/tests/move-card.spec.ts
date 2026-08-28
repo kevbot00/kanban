@@ -2,9 +2,6 @@ import { test, expect } from '@playwright/test';
 import { SEEDED_BOARD_ID } from '../support/config';
 
 test.describe('Move Card', () => {
-  test('add failing test to test ci/cd', async ({ page }) => {
-    expect(1).toBe(2);
-  })
   test('reorders a card within a column', async ({ page }) => {});
   test('moves a card to another column', async ({ page }) => {});
   test('moves a card into an empty column', async ({ page }) => {});
