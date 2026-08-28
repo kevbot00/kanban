@@ -3,7 +3,7 @@ import { resetTestDb } from '../support/db';
 
 test.describe('Add Card', () => {
   test.beforeEach(async ({ page }) => {
-    resetTestDb();
+    await resetTestDb();
     await page.goto('/');
   });
 

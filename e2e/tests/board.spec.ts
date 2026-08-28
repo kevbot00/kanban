@@ -1,9 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { SEEDED_BOARD_ID } from '../support/config';
+import { resetTestDb } from '../support/db';
 
 test.describe('Board', () => {
-  test('renders the board columns in order', async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
+    await resetTestDb();
     await page.goto('/');
+  });
+
+  test('renders the board columns in order', async ({ page }) => {
 
     const board = page.getByTestId('board');
     await expect(board.getByTestId('column-title')).toHaveText([
@@ -14,7 +19,6 @@ test.describe('Board', () => {
   });
 
   test("renders each column's cards in position order", async ({ page }) => {
-      await page.goto('/');
 
     const board = page.getByTestId('board');
     const todoColumn = board.getByTestId('column-list').first();
@@ -53,7 +57,6 @@ test.describe('Board', () => {
         }),
       });
     });
-    await page.goto('/');
     const board = page.getByTestId('board');
     const todoColumn = board.getByTestId('column-list').first();
     await expect(todoColumn.getByTestId('card')).toHaveCount(0);

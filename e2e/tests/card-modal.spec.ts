@@ -1,5 +1,6 @@
 import { test, expect, type Page, type Request } from '@playwright/test';
 import { resetTestDb } from '../support/db';
+import { SEEDED_DESCRIPTION } from '../support/test-data';
 
 const todoCards = (page: Page) => {
   return page
@@ -21,8 +22,19 @@ const openCardModal = async (page: Page, cardIndex = 0) => {
   await todoCards(page).nth(cardIndex).click();
 };
 
+const saveAndWait = async (page: Page, action: () => Promise<void>) => {
+  await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/cards/') &&
+        response.request().method() === 'PATCH',
+    ),
+    action(),
+  ]);
+};
+
 const watchCardSaveRequests = (page: Page) => {
-  const requests: any[] = [];
+  const requests: Request[] = [];
 
   page.on('request', (req: Request) => {
     if (req.url().includes('/api/cards/') && req.method() === 'PATCH') {
@@ -40,40 +52,39 @@ test.describe('Card modal', () => {
 
   test('opens when a card is clicked', async ({ page }) => {
     await openCardModal(page);
-    await expect(page.getByTestId('card-modal')).toBeVisible();
+    await expect(cardModal(page)).toBeVisible();
   });
 
   test('closes when the close button is clicked', async ({ page }) => {
     await openCardModal(page);
 
-    await expect(page.getByTestId('card-modal')).toBeVisible();
+    await expect(cardModal(page)).toBeVisible();
 
     const closeButton = page.getByTestId('card-modal-close-button');
     await closeButton.click();
 
-    await expect(page.getByTestId('card-modal')).toBeHidden();
+    await expect(cardModal(page)).toBeHidden();
   });
 
   test('closes when the Escape key is pressed', async ({ page }) => {
     await openCardModal(page);
 
-    await expect(page.getByTestId('card-modal')).toBeVisible();
+    await expect(cardModal(page)).toBeVisible();
 
     await page.keyboard.press('Escape');
 
-    await expect(page.getByTestId('card-modal')).toBeHidden();
+    await expect(cardModal(page)).toBeHidden();
   });
 
   test('shows the correct card title and description', async ({ page }) => {
     await openCardModal(page);
 
-    const cardModal = page.getByTestId('card-modal');
-    await expect(cardModal.getByTestId('card-modal-title')).toHaveText(
+    await expect(cardModal(page).getByTestId('card-modal-title')).toHaveText(
       'Persist board to localStorage',
     );
-    await expect(
-      cardModal.getByTestId('card-modal-description-textarea'),
-    ).toHaveValue('Persist the board state to localStorage so it is saved.');
+    await expect(cardModalDescriptionTextarea(page)).toHaveValue(
+      SEEDED_DESCRIPTION,
+    );
   });
 
   test.describe('card description', () => {
@@ -85,9 +96,9 @@ test.describe('Card modal', () => {
 
       await descriptionTextarea.click();
       await descriptionTextarea.fill('Updated description');
-      await cardModalEl
-        .getByTestId('card-modal-description-save-button')
-        .click();
+      await saveAndWait(page, () =>
+        cardModalEl.getByTestId('card-modal-description-save-button').click(),
+      );
 
       await page.reload();
       await openCardModal(page);
@@ -110,9 +121,7 @@ test.describe('Card modal', () => {
       await page.reload();
       await openCardModal(page);
 
-      await expect(descriptionTextarea).toHaveValue(
-        'Persist the board state to localStorage so it is saved.',
-      );
+      await expect(descriptionTextarea).toHaveValue(SEEDED_DESCRIPTION);
     });
 
     test('saves edits when clicking outside the field', async ({ page }) => {
@@ -123,7 +132,7 @@ test.describe('Card modal', () => {
 
       await descriptionTextarea.click();
       await descriptionTextarea.fill('Updated description');
-      await descriptionTextarea.blur();
+      await saveAndWait(page, () => descriptionTextarea.blur());
       await cardModalEl.getByTestId('card-modal-close-button').click();
 
       await page.reload();
@@ -148,9 +157,7 @@ test.describe('Card modal', () => {
       await page.reload();
       await openCardModal(page);
 
-      await expect(descriptionTextarea).toHaveValue(
-        'Persist the board state to localStorage so it is saved.',
-      );
+      await expect(descriptionTextarea).toHaveValue(SEEDED_DESCRIPTION);
 
       expect(requests).toHaveLength(0);
     });
