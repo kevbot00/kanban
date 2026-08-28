@@ -1,0 +1,63 @@
+name: CI Pipeline
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+      - run: npx prisma generate --schema api/prisma/schema.prisma
+      - run: npm run build
+
+  e2e:
+    name: End to end tests
+    needs: build
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: kanban
+          POSTGRES_PASSWORD: kanban
+          POSTGRES_DB: kanban_test
+          TEST_DATABASE_URL: 'postgresql://kanban:kanban@postgres:5432/kanban_test?schema=public'
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate --schema api/prisma/schema.prisma
+      - uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+      
+      - run: npm run test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: e2e/playwright-report/
