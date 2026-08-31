@@ -15,6 +15,7 @@ test.describe('Board', () => {
       'To Do',
       'In Progress',
       'Done',
+      'Backlog',
     ]);
   });
 
