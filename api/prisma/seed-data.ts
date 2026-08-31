@@ -48,6 +48,7 @@ export const SEED_BOARD = {
           ],
         },
       },
+      { title: 'Backlog', position: 4000 },
     ],
   },
 } satisfies Prisma.BoardCreateInput;

@@ -69,7 +69,7 @@ export default defineConfig({
       cwd: '../api',
       url: `${API_URL}/api/health`,
       env: { PORT: String(API_PORT), DATABASE_URL: TEST_DATABASE_URL },
-      reuseExistingServer: false,
+      reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
     },
     {
@@ -77,7 +77,7 @@ export default defineConfig({
       cwd: '../web',
       url: WEB_URL,
       env: { API_URL },
-      reuseExistingServer: false,
+      reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
     },
   ],
