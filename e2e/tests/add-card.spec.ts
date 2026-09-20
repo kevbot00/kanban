@@ -1,5 +1,12 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { resetTestDb } from '../support/db';
+
+const waitForCreate = (page: Page) =>
+  page.waitForResponse(
+    (response) =>
+      response.url().endsWith('/api/cards') &&
+      response.request().method() === 'POST',
+  );
 
 test.describe('Add Card', () => {
   test.beforeEach(async ({ page }) => {
@@ -14,7 +21,10 @@ test.describe('Add Card', () => {
     const todoColumn = board.getByTestId('column-list').first();
     await todoColumn.getByRole('button', { name: '+' }).click();
     await page.getByPlaceholder('Enter a title…').fill('New Card');
-    await page.getByPlaceholder('Enter a title…').blur();
+    await Promise.all([
+      waitForCreate(page),
+      page.getByPlaceholder('Enter a title…').blur(),
+    ]);
     await page.reload();
     await expect(todoColumn.getByTestId('card')).toHaveText([
       'Persist board to localStorage',
@@ -31,7 +41,10 @@ test.describe('Add Card', () => {
     const todoColumn = board.getByTestId('column-list').first();
     await todoColumn.getByRole('button', { name: '+' }).click();
     await page.getByPlaceholder('Enter a title…').fill('New Card');
-    await page.getByPlaceholder('Enter a title…').press('Enter');
+    await Promise.all([
+      waitForCreate(page),
+      page.getByPlaceholder('Enter a title…').press('Enter'),
+    ]);
     await page.reload();
     await expect(todoColumn.getByTestId('card')).toHaveText([
       'Persist board to localStorage',
