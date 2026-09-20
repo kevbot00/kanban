@@ -1,12 +1,22 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page, type Request } from '@playwright/test';
 import { resetTestDb } from '../support/db';
 
+const isCreateRequest = (request: Request) =>
+  request.url().endsWith('/api/cards') && request.method() === 'POST';
+
 const waitForCreate = (page: Page) =>
-  page.waitForResponse(
-    (response) =>
-      response.url().endsWith('/api/cards') &&
-      response.request().method() === 'POST',
-  );
+  page.waitForResponse((response) => isCreateRequest(response.request()));
+
+const watchCreateRequests = (page: Page) => {
+  const requests: Request[] = [];
+
+  page.on('request', (request: Request) => {
+    if (isCreateRequest(request)) {
+      requests.push(request);
+    }
+  });
+  return requests;
+};
 
 test.describe('Add Card', () => {
   test.beforeEach(async ({ page }) => {
@@ -59,6 +69,7 @@ test.describe('Add Card', () => {
   }) => {
     const board = page.getByTestId('board');
     const todoColumn = board.getByTestId('column-list').first();
+    const createRequests = watchCreateRequests(page);
     await todoColumn.getByRole('button', { name: '+' }).click();
     await page.getByPlaceholder('Enter a title…').fill('New Card');
     await page.getByPlaceholder('Enter a title…').press('Escape');
@@ -71,6 +82,7 @@ test.describe('Add Card', () => {
       'Write Playwright drag test',
       'Deploy to AWS',
     ]);
+    expect(createRequests).toHaveLength(0);
   });
 
   test('should cancel adding a new card on blur if the input is empty', async ({
@@ -78,6 +90,7 @@ test.describe('Add Card', () => {
   }) => {
     const board = page.getByTestId('board');
     const todoColumn = board.getByTestId('column-list').first();
+    const createRequests = watchCreateRequests(page);
     await todoColumn.getByRole('button', { name: '+' }).click();
     await page.getByPlaceholder('Enter a title…').blur();
 
@@ -89,5 +102,6 @@ test.describe('Add Card', () => {
       'Write Playwright drag test',
       'Deploy to AWS',
     ]);
+    expect(createRequests).toHaveLength(0);
   });
 });
