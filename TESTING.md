@@ -31,7 +31,7 @@ Every run gets a known starting state and never touches development data.
 
 ### Drag and drop
 
-`locator.dragTo()` does not work with dnd-kit. Its pointer sensor processes movement through `requestAnimationFrame`, and `dragTo` sends press, move, and release before a single frame runs, so dnd-kit sees a drag that starts and ends in place and drops nothing. The suite drives the mouse along an explicit path with intermediate `steps` instead.
+`locator.dragTo()` does not work with dnd-kit. Its pointer sensor processes movement through `requestAnimationFrame`, and `dragTo` sends press, move, and release before a single frame runs, so dnd-kit sees a drag that starts and ends in place and drops nothing. The suite drives the mouse along an explicit path with intermediate `steps` instead, then waits two animation frames before releasing so dnd-kit has handled the final position. WebKit needs that wait because it runs very few frames during synthetic mouse moves.
 
 ## Flaky tests fixed at the root cause
 
@@ -43,6 +43,8 @@ None of these were fixed with retries or sleeps.
 | Intermittent wrong starting state | `resetTestDb()` was not awaited and raced `page.goto` | Awaited the reset |
 | Server logged Prisma `P2025` in about one run in three | A move request was still in flight when the next test's reset deleted the card | Wait for the move response before the test ends |
 | New card sometimes missing after reload | The reload cancelled the in-flight create request | Wait for the create response before reloading. Reproduced deterministically by delaying the request 300ms; failed before the fix, passes after |
+| WebKit drags dropped the card back where it started (8 of 20 WebKit runs) | WebKit ran about 2 animation frames across a whole synthetic drag, so dnd-kit hadn't processed the final pointer position at release | Wait two animation frames before `mouse.up()` |
+| Empty-column test showed the seeded cards (2 of 5 Firefox runs, 1 of 5 WebKit) | The board stub was registered after `beforeEach` had already loaded the page, racing the board request | Register the route, then load the page |
 
 ## Weak tests found and fixed
 
@@ -55,7 +57,6 @@ These passed while not proving what they claimed. Several were found by delibera
 
 ## Known gaps
 
-- **Chromium only.** Firefox and WebKit are not run yet.
 - **Two fixed 500ms waits** in the unchanged-edit tests, described under assertion rules.
 - **No API-level tests.** Validation, 404s, and cross-board move rejection are only exercised through the UI. Request-level specs using Playwright's `request` fixture are planned.
 - **No unit tests.** The fractional position math in `CardsService.move` is covered only end to end.
@@ -69,4 +70,4 @@ npm run test:e2e        # headless
 npm run test:e2e:ui     # Playwright UI mode
 ```
 
-Run from the repo root. In CI, Postgres runs as a service container, traces are recorded on the first retry, and the HTML report is uploaded as an artifact.
+Run from the repo root. The suite runs in Chromium, Firefox, and WebKit with no retries. In CI, Postgres runs as a service container, traces are kept for failing tests, and the HTML report is uploaded as an artifact.
