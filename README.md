@@ -1,5 +1,7 @@
 # Kanban
 
+[![CI](https://github.com/kevbot00/kanban/actions/workflows/ci.yml/badge.svg)](https://github.com/kevbot00/kanban/actions/workflows/ci.yml)
+
 A Trello style kanban board with drag-and-drop, built as a full-stack TypeScript monorepo.
 
 Cards can be dragged within or across columns, with support for creating cards and updating descriptions.
