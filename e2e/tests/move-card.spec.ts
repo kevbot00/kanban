@@ -18,6 +18,12 @@ const dragCard = async (page: Page, card: Locator, target: Locator) => {
   await page.mouse.move(startX, startY + 10, { steps: 5 });
   await page.mouse.move(endX, endY, { steps: 20 });
   await page.mouse.move(endX, endY);
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      ),
+  );
   await page.mouse.up();
 };
 

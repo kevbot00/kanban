@@ -41,7 +41,7 @@ test.describe('Board', () => {
   });
 
   test('shows an empty column with no cards', async ({ page }) => {
-    await page.route('**/api/boards/' + SEEDED_BOARD_ID, (route) => {
+    await page.route('**/api/boards/' + SEEDED_BOARD_ID, (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -56,8 +56,10 @@ test.describe('Board', () => {
             },
           ],
         }),
-      });
-    });
+      }),
+    );
+    await page.goto('/');
+
     const board = page.getByTestId('board');
     const todoColumn = board.getByTestId('column-list').first();
     await expect(todoColumn.getByTestId('card')).toHaveCount(0);
