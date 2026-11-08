@@ -53,3 +53,5 @@ npm run test:e2e:ui
 ```
 
 Playwright starts its own servers on ports 3001 and 5174 against a separate `kanban_test` database, so a running `npm run dev` is never disturbed. Each test resets the database first.
+
+See [TESTING.md](TESTING.md) for the test strategy, the flaky and weak tests that were found and fixed, and known gaps.
