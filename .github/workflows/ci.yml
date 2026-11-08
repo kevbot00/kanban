@@ -23,6 +23,8 @@ jobs:
     name: End to end tests
     needs: build
     runs-on: ubuntu-latest
+    env:
+      TEST_DATABASE_URL: 'postgresql://kanban:kanban@localhost:5432/kanban_test?schema=public'
     services:
       postgres:
         image: postgres:18-alpine
@@ -30,7 +32,6 @@ jobs:
           POSTGRES_USER: kanban
           POSTGRES_PASSWORD: kanban
           POSTGRES_DB: kanban_test
-          TEST_DATABASE_URL: 'postgresql://kanban:kanban@postgres:5432/kanban_test?schema=public'
         ports:
           - 5432:5432
         options: >-
@@ -50,11 +51,12 @@ jobs:
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-      - run: npx playwright install --with-deps chromium
-      - run: npx playwright install chromium
+          key: playwright-${{ runner.os }}-chromium-firefox-webkit-${{ hashFiles('**/package-lock.json') }}
+      - run: npx playwright install --with-deps chromium firefox webkit
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-      
+      - run: npx playwright install-deps chromium firefox webkit
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+
       - run: npm run test:e2e
 
       - uses: actions/upload-artifact@v4
