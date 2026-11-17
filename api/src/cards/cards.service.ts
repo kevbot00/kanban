@@ -2,7 +2,9 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ConflictException,
 } from '@nestjs/common';
+import { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { HIDE_TIMESTAMPS, POSITION_STEP } from '../common/constants';
 import { CreateCardDto } from './dto/create-card.dto';
@@ -23,31 +25,42 @@ export class CardsService {
     return card;
   }
 
-  create({ id, title, description, columnId }: CreateCardDto) {
-    return this.prisma.$transaction(async (prisma) => {
-      const column = await prisma.boardColumn.findUnique({
-        where: { id: columnId },
-        select: { id: true },
-      });
-      if (!column) throw new NotFoundException(`Column ${columnId} not found`);
+  async create({ id, title, description, columnId }: CreateCardDto) {
+    try {
+      return await this.prisma.$transaction(async (prisma) => {
+        const column = await prisma.boardColumn.findUnique({
+          where: { id: columnId },
+          select: { id: true },
+        });
+        if (!column)
+          throw new NotFoundException(`Column ${columnId} not found`);
 
-      const last = await prisma.card.findFirst({
-        where: { columnId },
-        orderBy: [{ position: 'desc' }, { id: 'desc' }],
-        select: { position: true },
-      });
+        const last = await prisma.card.findFirst({
+          where: { columnId },
+          orderBy: [{ position: 'desc' }, { id: 'desc' }],
+          select: { position: true },
+        });
 
-      return prisma.card.create({
-        data: {
-          id,
-          title,
-          description,
-          columnId,
-          position: last ? last.position + POSITION_STEP : POSITION_STEP,
-        },
-        omit: HIDE_TIMESTAMPS,
+        return prisma.card.create({
+          data: {
+            id,
+            title,
+            description,
+            columnId,
+            position: last ? last.position + POSITION_STEP : POSITION_STEP,
+          },
+          omit: HIDE_TIMESTAMPS,
+        });
       });
-    });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new ConflictException(`Card ${id} already exists`);
+      }
+      throw error;
+    }
   }
 
   async update(id: string, data: UpdateCardDto) {
@@ -87,8 +100,9 @@ export class CardsService {
         orderBy: [{ position: 'asc' }, { id: 'asc' }],
         select: { position: true },
       });
-      const prev = siblings[toIndex - 1]?.position;
-      const next = siblings[toIndex]?.position;
+      const index = Math.min(toIndex, siblings.length);
+      const prev = siblings[index - 1]?.position;
+      const next = siblings[index]?.position;
 
       let position: number;
       if (prev === undefined && next === undefined) {
