@@ -3,3 +3,7 @@ dist
 test-results
 .vscode
 .claude
+.venv
+__pycache__
+.pytest_cache
+e2e-py/results.xml
