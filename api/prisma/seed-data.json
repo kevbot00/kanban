@@ -1,0 +1,37 @@
+{
+  "id": "00000000-0000-0000-0000-000000000001",
+  "slug": "kanban-board",
+  "title": "Kanban Board",
+  "columns": [
+    {
+      "title": "To Do",
+      "position": 1000,
+      "cards": [
+        {
+          "title": "Persist board to localStorage",
+          "description": "Persist the board state to localStorage so it is saved.",
+          "position": 1000
+        },
+        { "title": "Write Playwright drag test", "position": 2000 },
+        { "title": "Deploy to AWS", "position": 3000 }
+      ]
+    },
+    {
+      "title": "In Progress",
+      "position": 2000,
+      "cards": [
+        { "title": "Build board, column, and card components", "position": 1000 },
+        { "title": "Wire up dnd-kit sensors", "position": 2000 }
+      ]
+    },
+    {
+      "title": "Done",
+      "position": 3000,
+      "cards": [
+        { "title": "Scaffold Vite + React + TypeScript", "position": 1000 },
+        { "title": "Add Tailwind", "position": 2000 }
+      ]
+    },
+    { "title": "Backlog", "position": 4000 }
+  ]
+}
