@@ -1,7 +1,10 @@
+import allure
 from playwright.sync_api import Page, expect
 
 from pages.board_page import BoardPage
 from support.expected import TODO
+
+pytestmark = [allure.epic('UI · Playwright'), allure.feature('Add card')]
 
 
 def test_adds_a_card_on_enter(page: Page, api):

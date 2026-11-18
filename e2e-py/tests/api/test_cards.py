@@ -1,11 +1,15 @@
 import uuid
 
+import allure
 import pytest
 
 from support.db import insert_other_board
 from support.expected import BACKLOG, TODO
 
+pytestmark = [allure.epic('API'), allure.feature('Cards')]
 
+
+@allure.story('Create')
 class TestCreateCard:
     def test_creates_a_card_at_the_end_of_the_column(self, api):
         response = api.create_card({'title': 'New card', 'columnId': api.column('To Do')['id']})
@@ -62,6 +66,7 @@ class TestCreateCard:
         assert api.titles('To Do') == TODO
 
 
+@allure.story('Update')
 class TestUpdateCard:
     def test_updates_the_title(self, api):
         card_id = api.card_id('To Do', TODO[0])
@@ -94,6 +99,7 @@ class TestUpdateCard:
         assert response.status_code == 404
 
 
+@allure.story('Move')
 class TestMoveCard:
     @pytest.mark.parametrize(
         ('card', 'to_index', 'expected'),
@@ -152,10 +158,12 @@ class TestMoveCard:
         assert response.status_code == 404
 
 
+@allure.story('Get')
 def test_get_returns_404_for_an_unknown_card(api):
     assert api.client.get(f'/cards/{uuid.uuid4()}').status_code == 404
 
 
+@allure.story('Malformed ids')
 @pytest.mark.parametrize(
     ('method', 'path', 'body'),
     [

@@ -1,7 +1,10 @@
+import allure
 from playwright.sync_api import Page, expect
 
 from pages.board_page import BoardPage
 from support.expected import BACKLOG, IN_PROGRESS, TODO
+
+pytestmark = [allure.epic('UI · Playwright'), allure.feature('Move card'), allure.severity(allure.severity_level.CRITICAL)]
 
 
 def test_reorders_a_card_within_a_column(page: Page, api):

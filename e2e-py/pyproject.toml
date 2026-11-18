@@ -1,4 +1,4 @@
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
-addopts = "--browser chromium --tracing retain-on-failure --import-mode=importlib"
+addopts = "--browser chromium --tracing retain-on-failure --import-mode=importlib --alluredir=allure-results --clean-alluredir"

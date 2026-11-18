@@ -102,6 +102,9 @@ jobs:
       - run: python -m playwright install --with-deps chromium
       - run: pytest --junitxml=results.xml
         working-directory: e2e-py
+      - run: npx -y allure@3.33.0 generate allure-results --output allure-report --name "Kanban e2e (python)"
+        if: ${{ !cancelled() }}
+        working-directory: e2e-py
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
@@ -109,3 +112,8 @@ jobs:
           path: |
             e2e-py/results.xml
             e2e-py/test-results/
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: allure-report
+          path: e2e-py/allure-report/

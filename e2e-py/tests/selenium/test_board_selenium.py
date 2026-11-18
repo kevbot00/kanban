@@ -1,4 +1,7 @@
+import allure
 from support.expected import BACKLOG, DONE, IN_PROGRESS, TODO
+
+pytestmark = [allure.epic('UI · Selenium'), allure.feature('Board')]
 
 
 def test_renders_columns_and_cards_in_order(board):

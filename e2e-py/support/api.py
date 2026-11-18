@@ -1,3 +1,4 @@
+import allure
 import httpx
 
 from support.db import SEEDED_BOARD_ID
@@ -23,12 +24,15 @@ class KanbanApi:
             c['id'] for c in self.column(column_title)['cards'] if c['title'] == card_title
         )
 
+    @allure.step('Create a card')
     def create_card(self, body: dict) -> httpx.Response:
         return self.client.post('/cards', json=body)
 
+    @allure.step('Update card {card_id}')
     def update_card(self, card_id: str, body: dict) -> httpx.Response:
         return self.client.patch(f'/cards/{card_id}', json=body)
 
+    @allure.step('Move card {card_id} to index {to_index}')
     def move_card(self, card_id: str, to_column_id: str, to_index: int) -> httpx.Response:
         return self.client.post(
             f'/cards/{card_id}/move',

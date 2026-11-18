@@ -3,7 +3,7 @@
 The app is covered by two end-to-end suites, both run on every push and pull request in GitHub Actions:
 
 - a TypeScript Playwright suite in `e2e/`, with 20 browser tests across four specs, each run in Chromium, Firefox and WebKit
-- a Python suite in `e2e-py/`, with 27 API tests (pytest and httpx), 6 browser tests in pytest-playwright and 4 in Selenium WebDriver, each browser layer with its own page object
+- a Python suite in `e2e-py/`, with 27 API tests (pytest and httpx), 6 browser tests in pytest-playwright and 4 in Selenium WebDriver, each browser layer with its own page object, reported through Allure
 
 This document covers how the suites are isolated, the rules the assertions follow, the flaky and weak tests that were found and how they were fixed, and what is deliberately not covered yet.
 
@@ -31,6 +31,10 @@ This document covers how the suites are isolated, the rules the assertions follo
 ### Selenium
 
 Selenium can't wait on a network response the way Playwright's `expect_response` does, so the Selenium tests wait on conditions instead. `WebDriverWait` polls the API until the change has persisted, then polls the DOM until it matches, so neither side relies on a fixed sleep. The drag has the same problem as `dragTo` in Playwright: dnd-kit drops nothing if press, move and release arrive at once. `ActionChains` moves in 20 steps with short pauses between them so dnd-kit's `requestAnimationFrame` loop sees the drag.
+
+### Allure report
+
+The Python suite writes Allure results on every run. Tests are grouped by layer (API, Playwright, Selenium) and feature, and the API card tests also by story. Page object and API client methods are Allure steps, so a failing test shows which action broke. Every non-GET API call attaches its request and response bodies, and failing browser tests attach a screenshot. CI builds the report with Allure 3 and uploads it as the `allure-report` artifact.
 
 ## Isolation
 
@@ -119,4 +123,10 @@ If your Postgres volume predates `kanban_test_py`, create the database once with
 .venv/bin/pytest -v
 ```
 
-In CI it runs as a separate job with its own Postgres container, retries nothing, and uploads a JUnit report plus Playwright traces for failed tests.
+To browse the Allure report from the last run:
+
+```bash
+npx allure@3.33.0 open allure-results
+```
+
+In CI it runs as a separate job with its own Postgres container, retries nothing, and uploads a JUnit report, Playwright traces for failed tests, and the Allure report.
