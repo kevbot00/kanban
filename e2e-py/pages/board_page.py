@@ -1,3 +1,4 @@
+import allure
 from playwright.sync_api import Locator, Page, Response
 
 
@@ -6,6 +7,7 @@ class BoardPage:
         self.page = page
         self.board = page.get_by_test_id('board')
 
+    @allure.step('Open the board')
     def open(self) -> 'BoardPage':
         self.page.goto('/')
         return self
@@ -21,6 +23,7 @@ class BoardPage:
     def cards(self, column_title: str) -> Locator:
         return self.column(column_title).get_by_test_id('card')
 
+    @allure.step("Add '{title}' to {column_title}")
     def add_card(self, column_title: str, title: str) -> Response:
         self.column(column_title).get_by_role('button', name='+').click()
         field = self.page.get_by_label(f'New card title for {column_title}')
@@ -31,6 +34,7 @@ class BoardPage:
             field.press('Enter')
         return info.value
 
+    @allure.step('Drag the card onto the target')
     def drag_card(self, card: Locator, target: Locator) -> Response:
         src, dst = card.bounding_box(), target.bounding_box()
         assert src and dst, 'could not get bounding boxes for drag'

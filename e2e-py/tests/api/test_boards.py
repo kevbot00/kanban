@@ -1,6 +1,10 @@
 import uuid
 
+import allure
+
 from support.expected import BACKLOG, DONE, IN_PROGRESS, TODO
+
+pytestmark = [allure.epic('API'), allure.feature('Boards')]
 
 
 def test_seeded_board_matches_the_expected_state(api):

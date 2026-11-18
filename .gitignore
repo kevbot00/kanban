@@ -7,3 +7,5 @@ test-results
 __pycache__
 .pytest_cache
 e2e-py/results.xml
+e2e-py/allure-results
+e2e-py/allure-report

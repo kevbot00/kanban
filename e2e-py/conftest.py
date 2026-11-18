@@ -5,12 +5,20 @@ import pytest
 from support.api import KanbanApi
 from support.config import API_URL, PG_DSN, WEB_URL
 from support.db import reset_db
+from support.reporting import attach_exchange
 from support.servers import migrate, start_servers, stop_servers
 
 
 def pytest_configure(config):
     if getattr(config.option, 'numprocesses', None):
         raise pytest.UsageError('Every test resets one shared database; run without -n.')
+
+
+@pytest.hookimpl(wrapper=True)
+def pytest_runtest_makereport(item, call):
+    report = yield
+    setattr(item, f'rep_{report.when}', report)
+    return report
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -39,5 +47,9 @@ def fresh_db(db_conn):
 
 @pytest.fixture
 def api():
-    with httpx.Client(base_url=f'{API_URL}/api', timeout=10) as client:
+    with httpx.Client(
+        base_url=f'{API_URL}/api',
+        timeout=10,
+        event_hooks={'response': [attach_exchange]},
+    ) as client:
         yield KanbanApi(client)

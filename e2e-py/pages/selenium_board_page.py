@@ -1,3 +1,4 @@
+import allure
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -23,6 +24,7 @@ class SeleniumBoardPage:
         self.driver = driver
         self.wait = WebDriverWait(driver, timeout)
 
+    @allure.step('Open the board')
     def open(self) -> 'SeleniumBoardPage':
         self.driver.get(WEB_URL)
         self.wait.until(EC.visibility_of_element_located(CARD))
@@ -40,12 +42,14 @@ class SeleniumBoardPage:
     def card_titles(self, column_title: str) -> list[str]:
         return [el.text for el in self.column(column_title).find_elements(*CARD)]
 
+    @allure.step('Wait for {column_title} to show {expected}')
     def wait_for_cards(self, column_title: str, expected: list[str]) -> None:
         self.wait.until(
             lambda _: self.card_titles(column_title) == expected,
             f'{column_title} never showed {expected}',
         )
 
+    @allure.step("Add '{title}' to {column_title}")
     def add_card(self, column_title: str, title: str) -> None:
         self.column(column_title).find_element(By.XPATH, ".//button[normalize-space()='+']").click()
         field = self.wait.until(
@@ -55,6 +59,7 @@ class SeleniumBoardPage:
         )
         field.send_keys(title, Keys.ENTER)
 
+    @allure.step("Open '{card_title}'")
     def open_card(self, column_title: str, card_title: str) -> None:
         card = next(
             el for el in self.column(column_title).find_elements(*CARD) if el.text == card_title
@@ -68,10 +73,12 @@ class SeleniumBoardPage:
     def modal_description(self) -> str:
         return self.driver.find_element(*MODAL_DESCRIPTION).get_attribute('value')
 
+    @allure.step('Close the card modal')
     def close_modal(self) -> None:
         self.driver.find_element(*MODAL_CLOSE).click()
         self.wait.until(EC.invisibility_of_element_located(MODAL))
 
+    @allure.step("Drag '{card_title}' from {column_title} to {to_column_title}")
     def drag_card(self, column_title: str, card_title: str, to_column_title: str) -> None:
         card = next(
             el for el in self.column(column_title).find_elements(*CARD) if el.text == card_title
